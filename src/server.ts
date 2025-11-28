@@ -11,6 +11,26 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 connectDB();
+
+
+
+const allowedOrigins = ["https://event-mangement-backend-r5n2.vercel.app/"];
+// const allowedOrigins = ["http://localhost:5173", "https://x-one-sable.vercel.app"];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
+
  
 app.get('/', (_, res) => {
   res.send('Hello World!'); 
