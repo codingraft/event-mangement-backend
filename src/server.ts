@@ -5,33 +5,40 @@ import userRoutes from './routes/user.routes.js';
 import eventRoutes from './routes/event.routes.js';
 import cors from 'cors';
 import morgan from 'morgan';
-const app = express();
+
 dotenv.config();
-app.use(cors());
+const app = express();
+
+// CORS configuration - allow your frontend domains
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://event-mangement-backend-r5n2.vercel.app"
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.log('Blocked by CORS:', origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
+
 app.use(express.json());
 app.use(morgan('dev'));
 connectDB();
 
 
-
-const allowedOrigins = ["https://event-mangement-backend-r5n2.vercel.app/"];
-// const allowedOrigins = ["http://localhost:5173", "https://x-one-sable.vercel.app"];
-
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
-
-
- 
 app.get('/', (_, res) => {
   res.send('Hello World!'); 
 });
